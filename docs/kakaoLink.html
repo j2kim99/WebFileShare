@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Kakao Practice</title>
+		<script src="https://unpkg.com/vue@2.5.16/dist/vue.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.10/lodash.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/es6-promise/4.1.1/es6-promise.auto.min.js"></script>
+		<script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+	</head>
+
+	<body>
+		<h1>Kakao Link Example</h1>
+		<p>Type message for sharing</p>
+		<div id = "img">
+			<input type="text" size="80" placeholder="input sharing message" v-model = "shareMessage" />
+			<input type="submit" value="share!" v-on:click="share(shareMessage)" />
+		<br/><br/>
+			<img src="loginButton.png" width="120" v-on:click="loginWithKakao" v-show="!logined"/>
+			<img src="logoutButton.png" width="120" v-on:click="logoutWithKakao" v-show="logined" />
+		<br/><br/>
+			<a href="https://j2kim99.github.io/WebFileShare/index.html"> home </a>
+		</div>
+
+		<script type="text/javascript">
+  var vm = new Vue({
+    el: '#img',
+    data: {
+      shareMessage: "",
+      logined: false
+      },
+    created: function() {
+		Kakao.init("179ef71ef38badfc4529b020b3aa94ae");
+	  },
+    methods: {
+	  loginWithKakao: function() {
+			Kakao.Auth.login({
+				success: function(authObj) {
+					alert("login success!");
+					vm.logined = true;
+				},
+				fail: function(err) {
+					alert(JSON.stringify(err));
+				}
+			});
+		},
+	  logoutWithKakao: function() {
+			Kakao.Auth.logout();
+			if(Kakao.Auth.getAccessToken() != null){
+				alert("logout success!");
+				vm.logined = false;
+			}
+		},
+	  share: function(m) {
+	  	  if(this.logined == false) alert("login first!");
+	  	  else{
+			Kakao.Link.sendDefault({
+				objectType: 'text',
+				text: this.shareMessage,
+				link: {
+					webUrl: "https://j2kim99.github.io/WebFileShare/kakaoLink.html",
+					mobileWebUrl: "https://j2kim99.github.io/WebFileShare/kakaoLink.html"
+				}
+			});
+			this.shareMessage = "";
+		  }
+		}
+	  }
+  });
+
+	</script>
+	</body>
+</html>
