@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>P2P file chatting</title>
+		<script src="https://unpkg.com/vue@2.5.16/dist/vue.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.10/lodash.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/es6-promise/4.1.1/es6-promise.auto.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.2.0/dist/peerjs.min.js"></script>
+	</head>
+
+  <body>
+    <div id="chat">
+      <h2> {{peerID}} </h2>
+      <p>Use ID above for connection</p>
+      <input type="text" size="80" placeholder="input ID" v-model="targetID" v-on:keyup.13="join" />
+      <input type="submit" value="Join!" v-on:click="join" />
+      <br/>
+      <p>Currently connected to <b>{{connID}}</b></p>
+      <input type="text" size="80" placeholder="input message" v-model="message" v-on:keyup.13="send" />
+      <input type="submit" value="Send!" v-on:click="send" />
+      <input type="submit" value="Clear!" v-on:click="clear" />
+      <br/>
+      <input type="file" id="file" />
+      <input type="submit" value="Send File!" v-on:click="sendFile" />
+      <br/><br/>
+      <div v-for="q in que">
+        <div v-html="q2list(q)"></div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+var vm = new Vue({
+  el: '#chat',
+  data: {
+    peer: null,
+    conn: null,
+    peerID: "",
+    connID: "",
+    targetID: "",
+    message: "",
+    que: []
+  },
+  created: function() {
+    this.peer = new Peer(null, {
+      debug: 2
+    });
+    this.peer.on('open', function(id){
+      console.log('ID: '+id);
+      vm.peerID=id;
+    });
+    this.peer.on('connection', function(c){
+      if(vm.conn){
+        c.on('open', function(){
+          c.send({type: "str", data: "Already Connected"});
+          setTimeout(function(){c.close(); }, 500);
+        });
+        return;
+      }
+
+      vm.conn = c;
+      console.log("Connected: "+vm.conn.peer);
+      var t = new Date();
+      vm.que.push({
+        src: "system",
+        time:t,
+        data: {
+          type: "str",
+          data: "Connected to "+vm.conn.peer
+        }
+      });
+      vm.connID=""+vm.conn.peer;
+      vm.ready();
+    });
+    this.peer.on('disconnected', function(){
+      this.que.push({
+        src: "system",
+        data: {
+          type: "str",
+          data: "Disconnected"
+        }
+      });
+      console.log("Disconnected");
+      vm.connID="";
+    });
+    this.peer.on('close', function(){
+      this.que.push({
+        src: "system",
+        data: {
+          type: "str",
+          data: "Connection Closed"
+        }
+      });
+      console.log("Closed");
+      vm.connID="";
+    });
+    this.peer.on('error', function(err){
+      console.log(err);
+      alert(''+err);
+    });
+  },
+  methods: {
+    ready: function(){
+      this.conn.on('data', function(data){
+        console.log("Data recieved");
+        var t=new Date();
+        vm.que.push({src:"recv", time:t, data:data});
+      });
+    },
+    join: function(){
+      if(this.conn){
+        this.conn.close();
+        this.connID = "";
+        var t = new Date();
+        vm.que.push({
+          src:"system",
+          time:t,
+          data:{
+            type:"str",
+            data:"Disconnected"
+          }
+        });
+      }
+      this.conn=this.peer.connect(this.targetID, {
+        reliable: true
+      });
+      this.targetID="";
+      this.conn.on('open', function(){
+        console.log("Connected to: "+vm.conn.peer);
+        var t = new Date();
+        vm.que.push({
+          src:"system",
+          time:t,
+          data:{
+            type:"str",
+            data:"Connected to "+vm.conn.peer
+          }
+        });
+        vm.connID=""+vm.conn.peer;
+      });
+      this.conn.on('data', function(data){
+        console.log("Data recieved");
+        var t = new Date();
+        vm.que.push({src:"recv", time:t, data:data});
+      });
+    },
+    clear: function(){
+      var t = new Date();
+      vm.que = [{src:"system", time:t, data:{type:"str", data:"Message Cleared"}}];
+    },
+    send: function(){
+      if(vm.conn && vm.conn.open){
+        var data={
+          type: "str",
+          data: vm.message
+        }
+        var t = new Date();
+        vm.conn.send(data);
+        vm.que.push({src:"send", time:t, data:data});
+        vm.message="";
+      }else{
+        alert("Not connected");
+      }
+    },
+    sendFile: function(){
+      if(!vm.conn || !vm.conn.open){
+        alert("Not connected");
+      }
+      var file = document.getElementById("file").files[0];
+      var reader = new FileReader();
+      reader.onload = (function(e){
+        var data = {
+          type: "fileSrc",
+          name: file.name,
+          data: e.target.result
+        };
+        vm.conn.send(data);
+        var t = new Date();
+        vm.que.push({src:"send", time: t, data:data});
+      });
+      reader.readAsDataURL(file);
+    },
+    q2list: function(q){
+      var h=q.time.getHours();
+      var m=q.time.getMinutes();
+      var s=q.time.getSeconds();
+      if(m<10) {m='0'+m};
+      if(s<10) {s='0'+s};
+      var hms = "[" + h + ":" + m + ":" + s + "] ";
+
+      if(q.data.type=="str"){
+        var line = hms + q.src+": "+q.data.data;
+        return line+'<br/>';
+      }else if(q.data.type=="fileSrc"){
+        return hms + q.src + ": " + "<a href='"+q.data.data+"' download='"+q.data.name+"' size='50'>"+q.data.name+"</a>";
+      }
+    }
+  }
+});
+    </script>
+  </body>
+</html>
