@@ -1,0 +1,38 @@
+
+> vueti-3@0.1.0 build D:\git\vueti-3
+> vue-cli-service build
+
+
+-  Building for production...
+ WARNING  Compiled with 2 warnings17:18:22
+
+ warning  
+
+asset size limit: The following asset(s) exceed the recommended size limit (244 KiB).
+This can impact web performance.
+Assets: 
+  css/chunk-vendors.9d7dd61c.css (307 KiB)
+  js/chunk-vendors.263878f0.js (279 KiB)
+
+ warning  
+
+entrypoint size limit: The following entrypoint(s) combined asset size exceeds the recommended limit (244 KiB). This can impact web performance.
+Entrypoints:
+  app (594 KiB)
+      css/chunk-vendors.9d7dd61c.css
+      js/chunk-vendors.263878f0.js
+      js/app.ff24196e.js
+
+
+  File                                   Size              Gzipped
+
+  dist\js\chunk-vendors.263878f0.js      278.72 KiB        91.24 KiB
+  dist\js\app.ff24196e.js                8.10 KiB          3.11 KiB
+  dist\js\about.d8b5f502.js              0.44 KiB          0.31 KiB
+  dist\css\chunk-vendors.9d7dd61c.css    307.13 KiB        34.67 KiB
+
+  Images and other types of assets omitted.
+
+ DONE  Build complete. The dist directory is ready to be deployed.
+ INFO  Check out deployment instructions at https://cli.vuejs.org/guide/deployment.html
+      
