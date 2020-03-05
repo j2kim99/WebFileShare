@@ -309,7 +309,7 @@ export default {
       }
     },
     share: function() {
-      var url = "http://192.168.35.129:8080/";
+      var url = "http://j2kim99.github.io/WebFileShare/";
       var link = url + "?conn=" + this.peerID + "&";
 
       if (this.peerID != "") {
