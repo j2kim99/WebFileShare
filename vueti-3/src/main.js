@@ -3,6 +3,7 @@ import App from "./App.vue";
 import router from "./router";
 import vuetify from "./plugins/vuetify";
 import Peer from "peerjs";
+import Kakao from "./plugins/kakao";
 
 Vue.config.productionTip = false;
 
