@@ -31,18 +31,18 @@
     </v-app-bar>
 
     <v-content>
-      <v-row align="center" justify="center">
+      <v-row align="center" justify="center" dense>
         <v-col cols="1" />
-        <v-col cols="8">
+        <v-col cols="9">
           <h1>
             Your code is
             <span class="blue--text text--lighten-2">{{ peerID }}</span>
           </h1>
         </v-col>
         <v-col cols="1" align="center">
-          <v-tooltip top>
+          <v-tooltip top v-if="peerID != ''">
             <template v-slot:activator="{ on }">
-              <v-btn color="yellow" dark v-on="on" v-on:click="share">
+              <v-btn color="yellow" dark v-on="on" v-on:click="share" width="80">
                 <v-icon color="black"> mdi-alpha-k-circle </v-icon>
                 <v-icon color="black"> mdi-share </v-icon>
               </v-btn>
@@ -50,40 +50,20 @@
             <Span> Share code by KakaoTalk </Span>
           </v-tooltip>
         </v-col>
-        <v-col cols="2" />
+        <v-col cols="1" />
       </v-row>
       <v-row v-if="connID != ''" dense>
         <v-col cols="1" />
-        <v-col>
+        <v-col cols="9">
           <h1>
             Currently connected to
             <span class="purple--text text--lighten-2">{{ connID }}</span>
           </h1>
         </v-col>
-      </v-row>
-      <v-row align="center" justify="center" dense>
-        <v-col cols="1" />
-        <v-col cols="8">
-          <v-text-field
-            label="Reciever's Code"
-            v-model="targetID"
-            v-on:keyup.13="join"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="1" align="center">
+ <v-col cols="1" align="center">
           <v-tooltip top>
             <template v-slot:activator="{ on }">
-              <v-btn color="blue" dark v-on="on" v-on:click="join"
-                ><v-icon>mdi-phone-forward-outline</v-icon></v-btn
-              >
-            </template>
-            <span>Connect</span>
-          </v-tooltip>
-        </v-col>
-        <v-col cols="1" align="center">
-          <v-tooltip top>
-            <template v-slot:activator="{ on }">
-              <v-btn color="red" dark v-on="on" v-on:click="disconnect"
+              <v-btn color="red" dark v-on="on" v-on:click="disconnect" width="80"
                 ><v-icon>mdi-phone-off-outline</v-icon></v-btn
               >
             </template>
@@ -94,7 +74,28 @@
       </v-row>
       <v-row align="center" justify="center" dense>
         <v-col cols="1" />
-        <v-col cols="8">
+        <v-col cols="9">
+          <v-text-field
+            label="Reciever's Code"
+            v-model="targetID"
+            v-on:keyup.13="join"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="1" align="center">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn color="blue" dark v-on="on" v-on:click="join" width="80"
+                ><v-icon>mdi-phone-forward-outline</v-icon></v-btn
+              >
+            </template>
+            <span>Connect</span>
+          </v-tooltip>
+        </v-col>
+               <v-col cols="1" />
+      </v-row>
+      <v-row align="center" justify="center" dense>
+        <v-col cols="1" />
+        <v-col cols="9">
           <v-text-field
             label="Message"
             v-model="message"
@@ -104,19 +105,19 @@
         <v-col cols="1" align="center">
           <v-tooltip top>
             <template v-slot:activator="{ on }">
-              <v-btn color="green" dark v-on="on" v-on:click="send"
+              <v-btn color="green" dark v-on="on" v-on:click="send" width="80"
                 ><v-icon>mdi-send</v-icon></v-btn
               >
             </template>
             <span>Send Message</span>
           </v-tooltip>
         </v-col>
-        <v-col cols="2" />
+        <v-col cols="1" />
       </v-row>
 
       <v-row align="center" justify="center" dense>
         <v-col cols="1" />
-        <v-col cols="8">
+        <v-col cols="9">
           <template
             ><v-file-input label="File" id="file"></v-file-input
           ></template>
@@ -124,14 +125,14 @@
         <v-col cols="1" align="center">
           <v-tooltip top>
             <template v-slot:activator="{ on }">
-              <v-btn color="brown" dark v-on="on" v-on:click="sendFile"
+              <v-btn color="brown" dark v-on="on" v-on:click="sendFile" width="80"
                 ><v-icon>mdi-file-send</v-icon></v-btn
               >
             </template>
             <span>Send File</span>
           </v-tooltip>
         </v-col>
-        <v-col cols="2" />
+        <v-col cols="1" />
       </v-row>
 
       <v-row align="center" dense>
@@ -147,19 +148,25 @@
         <v-col cols="1" />
         <v-col cols="10">
           <v-list>
-            <v-list-item v-for="q in que" :key="q.time">
-              <v-tooltip left>
-                <template v-slot:activator="{ on }">
-                  <v-icon v-if="q.src == 'send'" v-on="on">
+            <v-list-item v-for="q in que" :key="q.num">
+            <v-row>
+              <v-col cols="2" align="center" >
+                <v-tooltip left>
+                  <template v-slot:activator="{on}">
+                  <span class="pr-3">
+                  <v-icon v-if="q.src == 'send'" v-on="on" color="cyan">
                     mdi-arrow-right
                   </v-icon>
-                  <v-icon v-if="q.src == 'system'" v-on="on"> mdi-bell </v-icon>
-                  <v-icon v-if="q.src == 'recv'" v-on="on">
+                  <v-icon v-if="q.src == 'system'" v-on="on" color="yellow" class="text--darken-1"> mdi-bell </v-icon>
+                  <v-icon v-if="q.src == 'recv'" v-on="on" color="purple" class="text--lighten-1">
                     mdi-arrow-left
-                  </v-icon>
-                </template>
-                <span> {{ hms(q) }} </span>
-              </v-tooltip>
+                  </v-icon></span>
+                  </template>
+                  <span>{{q.src}}</span>
+                </v-tooltip>
+
+                  <span>{{hms(q)}}</span>
+              </v-col>
               <v-list-item-content v-if="q.data.type == 'str'">
                 {{ q.data.data }}
               </v-list-item-content>
@@ -181,6 +188,7 @@
                 </template>
                 Download <span style="color:#99FF99"> {{ q.data.name }} </span>
               </v-tooltip>
+            </v-row>
             </v-list-item>
           </v-list>
         </v-col>
@@ -207,7 +215,8 @@ export default {
     connID: "",
     targetID: "",
     message: "",
-    que: []
+    que: [],
+    qnum: 0
   }),
   created() {
     var connparam = this.getParameters("conn");
@@ -246,7 +255,9 @@ export default {
       vm.conn = c;
       console.log("Connected: " + vm.conn.peer);
       var t = new Date();
+      vm.qnum++;
       vm.que.push({
+        num: vm.qnum,
         src: "system",
         time: t,
         data: {
@@ -258,7 +269,9 @@ export default {
       vm.ready();
     });
     this.peer.on("disconnected", function() {
+      vm.qnum++;
       this.que.push({
+        num: vm.qnum,
         src: "system",
         data: {
           type: "str",
@@ -270,7 +283,9 @@ export default {
       vm.conn = null;
     });
     this.peer.on("close", function() {
+      vm.qnum++;
       this.que.push({
+        num: vm.qnum,
         src: "system",
         data: {
           type: "str",
@@ -329,7 +344,8 @@ export default {
       this.conn.on("data", function(data) {
         console.log("Data recieved");
         var t = new Date();
-        vm.que.push({ src: "recv", time: t, data: data });
+        vm.qnum++;
+        vm.que.push({ num:vm.qnum, src: "recv", time: t, data: data });
       });
     },
     join: function() {
@@ -338,7 +354,9 @@ export default {
         this.conn.close();
         if (this.connID != "") {
           var t = new Date();
+          vm.qnum++;
           vm.que.push({
+            num:vm.qnum,
             src: "system",
             time: t,
             data: {
@@ -356,7 +374,9 @@ export default {
       this.conn.on("open", function() {
         console.log("Connected to: " + vm.conn.peer);
         var t = new Date();
+        vm.qnum++;
         vm.que.push({
+          num:vm.qnum,
           src: "system",
           time: t,
           data: {
@@ -369,7 +389,8 @@ export default {
       this.conn.on("data", function(data) {
         console.log("Data recieved");
         var t = new Date();
-        vm.que.push({ src: "recv", time: t, data: data });
+        vm.qnum++;
+        vm.que.push({ num:vm.qnum, src: "recv", time: t, data: data });
       });
     },
     disconnect: function() {
@@ -378,7 +399,9 @@ export default {
         this.conn.close();
         var t = new Date();
         if (this.connID != "") {
+          vm.qnum++;
           vm.que.push({
+            num:vm.qnum,
             src: "system",
             time: t,
             data: {
@@ -399,8 +422,10 @@ export default {
       ) {
         var vm = this;
         var t = new Date();
+        vm.qnum++;
         vm.que = [
           {
+            num:vm.qnum,
             src: "system",
             time: t,
             data: { type: "str", data: "Message Cleared" }
@@ -417,7 +442,8 @@ export default {
         };
         var t = new Date();
         vm.conn.send(data);
-        vm.que.push({ src: "send", time: t, data: data });
+        vm.qnum++;
+        vm.que.push({ num:vm.qnum, src: "send", time: t, data: data });
         vm.message = "";
       } else {
         if (this.connID != "") {
@@ -444,7 +470,8 @@ export default {
         };
         vm.conn.send(data);
         var t = new Date();
-        vm.que.push({ src: "send", time: t, data: data });
+        vm.qnum++;
+        vm.que.push({ num:vm.qnum, src: "send", time: t, data: data });
       };
       reader.readAsDataURL(file);
     },
@@ -460,6 +487,7 @@ export default {
         s = "0" + s;
       }
       var hms = "[" + h + ":" + m + ":" + s + "] ";
+      return hms;
     }
   }
 };
