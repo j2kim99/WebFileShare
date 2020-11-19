@@ -1,6 +1,6 @@
 # Web File Sharing Application
 
-Builded page is deployed on [here](j2kim99.github.io/WebFileShare).
+Builded page is deployed on [here](https://j2kim99.github.io/WebFileShare/#/).
 
 
 ## Compatiblity
